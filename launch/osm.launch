@@ -1,0 +1,32 @@
+<launch>
+  <!-- Create run rrt driver -->
+  <node name="IMOMD" pkg="imomd_rrt_star" type="main_node" output="screen" required="true" cwd="node">
+    <rosparam file="$(find imomd_rrt_star)/config/algorithm_config.yaml" command="load" />
+    <rosparam file="$(find imomd_rrt_star)/config/osm_way_config.yaml" command="load" />
+
+
+    <!-- log commands (saved in ~/.ros folder) -->
+    <param name="log_data" value="0" />
+
+
+    <!-- number of  objectives (destination_1, ..., destination_i)-->
+    <param name="num_objectives" value="6" />
+
+
+
+    <!-- ============= Driver mode ============= -->
+    <!-- 0: clicked on rviz to get desinations (start, destination_1, ...,
+            destination_i, target )-->
+    <!-- 1: use provided ids from the config file-->
+    <param name="driver_mode" value="1" />
+
+
+    <!-- ============= Publishing Parameters ============= -->
+    <param name="publishing_rate" value="300" /> <!-- Hz -->
+
+  </node>
+
+  <!-- Create Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find imomd_rrt_star)/rviz/osm_bugtrap.rviz" required="false"/>
+
+</launch>

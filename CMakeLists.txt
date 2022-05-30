@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(imomt_rrt_star)
+project(imomd_rrt_star)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -13,8 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   cmake_modules
 )
-
-find_package(TinyXML REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -106,10 +104,12 @@ find_package(TinyXML REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES imomt_rrt_star
-  CATKIN_DEPENDS roscpp std_msgs visualization_msgs
-  DEPENDS system_lib TinyXML
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    imomd_rrt_star
+  CATKIN_DEPENDS
+    roscpp std_msgs visualization_msgs
 )
 
 ###########
@@ -138,9 +138,13 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(main_node 
-  src/main.cpp src/imomt_rrt_star.cpp src/osm_parser.cpp src/map_visualizer.cpp
-  src/utils/plotting.cpp)
-target_link_libraries(main_node ${catkin_LIBRARIES} ${TinyXML_LIBRARIES})
+  src/main.cpp src/driver/driver.cpp
+  src/osm_converter/osm_parser.cpp
+  src/osm_converter/coordinates_converter.cpp
+  src/imomd_rrt_star.cpp src/eci_gen_tsp_solver.cpp 
+  src/baseline/bi_a_star.cpp src/baseline/ana_star.cpp
+  src/utils/ros_plotting.cpp src/tinyxml2/tinyxml2.cpp)
+target_link_libraries(main_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

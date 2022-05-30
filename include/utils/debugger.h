@@ -34,7 +34,11 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <iomanip>      // std::setprecision
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
+#include <type_traits> // printout containers
 
 
 extern int DEBUG_LEVEL;
@@ -114,6 +118,7 @@ namespace debugger
                       << "\033[0m"
                       << std::endl;
     }
+
 
 
     template <class T>
@@ -214,6 +219,70 @@ namespace debugger
             exit(-1);
         }
         
+    }
+
+
+
+    // Helper to determine whether there's a const_iterator for T.
+    // template<typename T>
+    // struct has_const_iterator
+    // {
+    //     private:
+    //         template<typename C> static char test(typename C::const_iterator*);
+    //         template<typename C> static int  test(...);
+    //     public:
+    //         enum { value = sizeof(test<T>(0)) == sizeof(char) };
+    // };
+
+
+    // // bar() is defined for Containers that define const_iterator as well
+    // // as value_type.
+    // template <typename Container> 
+    //     debugColorVectorOutput(const std::string text,
+    //             const Container &c, typename Container::value_type const & t)
+    //     {
+    //         // Note: no extra check needed for value_type, the check comes for
+    //         //       free in the function signature already.
+    //     }
+
+
+
+    template <typename Container>
+    void debugColorContainerOutput(const std::string text, 
+            const Container& container, int level = 0, 
+            text_color_t color = RED, text_front_t font = N)
+    {
+        if (container.empty())
+            return;
+        if (level >= DEBUG_LEVEL)
+        {
+            std::cout << "\033[" + std::to_string(font) + ";" + 
+                         std::to_string(color) + "m" 
+                      << text << "\033[0m";
+            // typename Container::iterator last = std::prev(container.end()); 
+            // std::unordered_set<int>::iterator last = std::prev(container.end()); 
+            for (auto it = container.begin(); it != container.end(); ++it)
+            {
+                if (it != container.begin())
+                {
+                    std::cout << "\033[" + std::to_string(font) + ";" + 
+                        std::to_string(color) + "m" 
+                        << ", " << "\033[0m";
+                }
+                std::cout << "\033[" + std::to_string(font) + ";" + 
+                    std::to_string(color) + "m" 
+                    << *it << "\033[0m";
+
+            }
+            std::cout << std::endl;
+
+            // std::string pre_identifier = "\033[" + std::to_string(font) + ";" +
+            //     std::to_string(color) + "m";
+            // std::string end_identifier = "\033[0m";
+            // std::copy(container.begin(), container.end(), 
+            //           std::ostream_iterator<typename Container::value_type>(
+            //               std::cout, " "));
+        }
     }
 
 } /* debugger */ 

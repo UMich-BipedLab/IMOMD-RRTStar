@@ -33,6 +33,8 @@
 #include <iostream>
 #include <fstream>
 
+extern bool LOG_COMMAND;
+
 class CSVFile;
 
 inline static CSVFile& endrow(CSVFile& file);

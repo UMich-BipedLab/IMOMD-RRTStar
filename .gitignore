@@ -114,3 +114,13 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,linux,windows,macos
+
+ctags_file
+
+main
+*.osm
+node*.csv
+<<<<<<< HEAD
+=======
+*command_history.csv
+>>>>>>> 8de410d98f14b9069f9c4fd8c6090b46345ac337
