@@ -34,9 +34,11 @@
 #include <signal.h>
 #include <time.h>
 #include <sstream>      // std::ostringstream
+#include <math.h> // M_PI
 
 #include <numeric> // std::iota
 #include <vector>
+#include <mutex> // std::once_flag, std::call_once
 
 
 // for time and date
@@ -64,10 +66,11 @@ namespace utils
     genInclusiveRandomNumber(double min, double max) 
     {
         // run the seed only ONCE
-        static bool once = [](){
+        std::once_flag once_flag;
+        std::call_once(once_flag, []{
             srand((unsigned)(time(NULL)));
             return true;
-        } ();
+        });
         return min + (max - min) * ((double)rand()/RAND_MAX);
         // return  min + (max - min) * drand48();
     }
@@ -77,10 +80,11 @@ namespace utils
     genRandomNumber(double min, double max) 
     {
         // run the seed only ONCE
-        static bool once = [](){
+        std::once_flag once_flag;
+        std::call_once(once_flag, []{
             srand((unsigned)(time(NULL)));
             return true;
-        } ();
+        });
 
         srand48((unsigned)(time(NULL)));
         return  min + (max - min) * drand48();
@@ -127,7 +131,6 @@ namespace utils
 
     inline void 
     pressEnterToContinue() {
-        int c;
         signal(SIGINT, [](int signum) {
                 std::exit(signum);} // end of lambda expression
         );
@@ -195,64 +198,6 @@ namespace utils
 
         return std::string(path);
     }
-
-
-    // function for line generation
-    // inline
-    // int bresenham(float x1, float y1, float x2, float y2)
-    // {
-    //     // Bresenham's line algorithm
-    //     const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
-    //     if(steep) {
-    //         std::swap(x1, y1);
-    //         std::swap(x2, y2);
-    //     }
-
-    //     if(x1 > x2) {
-    //         std::swap(x1, x2);
-    //         std::swap(y1, y2);
-    //     }
-
-    //     const float dx = x2 - x1;
-    //     const float dy = fabs(y2 - y1);
-
-    //     float error = dx / 2.0f;
-    //     const int ystep = (y1 < y2) ? 1 : -1;
-    //     int y = (int)y1;
-
-    //     const int maxX = (int)x2;
-
-
-    //     int n = maxX - (int)x1 + 1;
-    //     int xcoords[n] = {0};
-    //     int ycoords[n] = {0};
-    //     int i = 0;
-    //     for(int x = (int)x1; x <= maxX; x++) {
-    //         if(steep) {
-    //             // cout << "(" << y << "," << x << ")\n";
-    //             points[0][i] = y;
-    //             points[1][i++] = x;
-    //         }
-    //         else {
-    //             // cout << "(" << x << "," << y << ")\n";
-    //             points[0][i] = x;
-    //             points[1][i++] = y;
-    //         }
-
-    //         error -= dy;
-    //         if(error < 0) {
-    //             y += ystep;
-    //             error += dx;
-    //         }
-    //     }
-    //     
-    //     int points[2][n] = {xcoords, ycoords};
-
-    //     return 0;
-    // }
-
-
-
 } /* general */ 
     
 } /* bipedlab */ 

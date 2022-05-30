@@ -1,0 +1,54 @@
+# Check the below website for more information about types of way in OSM
+# https://wiki.openstreetmap.org/wiki/Key:highway
+
+osm_show_ways: 0 # 0: All,  1: Cars,  2: Walkers,  3: Cyclists 
+
+osm_all:
+  key:
+    - highway
+    - footway
+    - sidewalk
+    - cycleway
+
+osm_cars:
+  value:
+    - motorway
+    - trunk
+    - primary
+    - secondary
+    - tertiary
+    - unclassified
+    - residential
+    - motorway_link
+    - trunk_link
+    - primary_link
+    - secondary_link
+    - tertiary_link
+    - living_street
+    - service
+    - track
+    - raceway
+    - road
+
+osm_walkers:
+  key:
+    - sidewalk
+    - footway
+  value:
+    - living_street
+    - service
+    - pedestrian
+    - track
+    - road
+    - footway
+    - bridleway
+    - steps
+    - path
+    - sidewalk
+    - crossing
+
+osm_cyclists:
+  key:
+    - cycleway
+  value:
+    - cycleway

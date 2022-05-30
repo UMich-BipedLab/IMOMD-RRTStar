@@ -64,7 +64,7 @@ namespace timing
     }
 
     inline
-    double printSpendCPUHz(
+    void printSpendCPUHz(
             const std::clock_t &t_start, std::string txt, 
             const std::clock_t t_end = std::clock()){
         std::cout << std::fixed << std::setprecision(2)
@@ -72,7 +72,7 @@ namespace timing
     }
 
     inline
-    double printSpendCPUHz(
+    void printSpendCPUHz(
             const std::clock_t &t_start,
             const std::clock_t &t_end = std::clock()){
         std::string text = "CPU time used: ";
@@ -117,7 +117,7 @@ namespace timing
     }
 
     inline
-    double printSpendElapsedHz(
+    void printSpendElapsedHz(
             const std::chrono::steady_clock::time_point &t_start,
             std::string txt,
             const std::chrono::steady_clock::time_point &t_end = getCurrentTime())
@@ -127,7 +127,7 @@ namespace timing
     }
 
     inline
-    double printSpendElapsedHz(
+    void printSpendElapsedHz(
             const std::chrono::steady_clock::time_point &t_start,
             const std::chrono::steady_clock::time_point &t_end = getCurrentTime())
     {

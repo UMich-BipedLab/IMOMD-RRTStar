@@ -1,89 +1,111 @@
+/* Copyright (C) 2013-2025, The Regents of The University of Michigan.
+ * All rights reserved.
+ * This software was developed in the Biped Lab (https://www.biped.solutions/)
+ * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may
+ * be available under alternative licensing terms; contact the address above.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The views and conclusions contained in the software and documentation are those
+ * of the authors and should not be interpreted as representing official policies,
+ * either expressed or implied, of the Regents of The University of Michigan.
+*/
 /*******************************************************************************
- * File:        osm_converter.cpp
+ * File:        osm_parser.cpp
  * 
  * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
  * Created:     02/24/2022
  * 
  * Description: Parser Open Street Map(xml) to vector data in c++
 *******************************************************************************/
-#include "../include/osm_parser/osm_parser.h"
+#include "osm_converter/osm_parser.h"
+#include "utils/utils.h"
 
 std::shared_ptr<std::vector<location_t>> OSMParser::getMap()
 {
     return std::make_shared<std::vector<location_t>>(nodes_);
 }
 
-std::shared_ptr<std::vector<std::vector<std::pair<int, double>>>> OSMParser::getConnection()
+std::shared_ptr<std::vector<std::unordered_map<size_t, double>>> OSMParser::getConnection()
 {
-    return std::make_shared<std::vector<std::vector<std::pair<int, double>>>>(connection_);
+    return std::make_shared<std::vector<std::unordered_map<size_t, double>>>(connection_);
 }
 
 void OSMParser::parse()
 {
-    TiXmlDocument doc(xml_);
-    TiXmlNode* osm;
-    TiXmlNode* node;
-    TiXmlNode* way;
+    tinyxml2::XMLDocument doc;
 
-    TiXmlHandle h_root_node(0);
-    TiXmlHandle h_root_way(0);
-
-    bool loadOkay = doc.LoadFile();
-
-    if (loadOkay)
+    if (doc.LoadFile(xml_.c_str()) == tinyxml2::XML_SUCCESS)
     {
-        bipedlab::debugger::debugColorOutput("Load OSM file: ", xml_, 10);
+        bipedlab::debugger::debugColorOutput("[OSMParser] Loaded OSM file: ", xml_, 10, G);
     }
     else
     {
-        throw std::runtime_error("Failed to load xml : " + xml_);
+        throw std::runtime_error("Failed to load xml: " + xml_);
     }
 
-    osm = doc.FirstChildElement();
-    node = osm->FirstChild("node");
-    way = osm->FirstChild("way");
+    tinyxml2::XMLElement* osm = doc.FirstChildElement();
 
-    TiXmlElement* node_element = node->ToElement();
-    TiXmlElement* way_element = way->ToElement();
+    tinyxml2::XMLElement* node_element = osm->FirstChildElement("node");
+    tinyxml2::XMLElement* way_element = osm->FirstChildElement("way");
 
-    h_root_node = TiXmlHandle(node_element);
-    h_root_way = TiXmlHandle(way_element);
+    tinyxml2::XMLHandle h_root_node = tinyxml2::XMLHandle(node_element);
+    tinyxml2::XMLHandle h_root_way = tinyxml2::XMLHandle(way_element);
 
     createWays_(&h_root_way, &h_root_node);
     createNodes_();
     createNetwork_();
+
+    bipedlab::debugger::debugTitleTextOutput("[OSMParser]",
+        "Create Network (Nodes : " + std::to_string(nodes_.size()) +
+        ") (Edges : " + std::to_string(edge_number_) + ")", 10, BG);
 }
 
-void OSMParser::createWays_(TiXmlHandle* h_root_way, TiXmlHandle* h_root_node)
+void OSMParser::createWays_(tinyxml2::XMLHandle* h_root_way, tinyxml2::XMLHandle* h_root_node)
 {   
-    TiXmlElement* node_element = h_root_node->Element();
+    tinyxml2::XMLElement* node_element = h_root_node->ToElement();
     location_t location_tmp;
 
     size_t node_id;
-    for (node_element; node_element; node_element = node_element->NextSiblingElement("node"))
+    for (; node_element; node_element = node_element->NextSiblingElement("node"))
     {
         std::sscanf(node_element->Attribute("id"), "%zu", &node_id);
-        node_element->Attribute("lat", &location_tmp.latitude);
-        node_element->Attribute("lon", &location_tmp.longitude);
+        location_tmp.latitude = node_element->DoubleAttribute("lat");
+        location_tmp.longitude = node_element->DoubleAttribute("lon");
         
         nodes_map_.insert({node_id, location_tmp});
     }
 
     ways_.clear();
-    TiXmlElement* way_element = h_root_way->Element();
+    tinyxml2::XMLElement* way_element = h_root_way->ToElement();
     osm_way_t way_tmp;
-    TiXmlElement* tag;
+    tinyxml2::XMLElement* tag;
 
-    for (way_element; way_element; way_element = way_element->NextSiblingElement("way"))
+    for (; way_element; way_element = way_element->NextSiblingElement("way"))
     {
         tag = way_element->FirstChildElement("tag");
         std::sscanf(way_element->Attribute("id"), "%zu", &way_tmp.id);
 
         while (tag != NULL)
         {
-            if (isHighway_(tag))
+            if (filterWay_(tag))
             {
-                getNodesInWay_(way_element, way_tmp); //finding all nodes located in selected way
+                //finding all nodes located in selected way
+                getNodesInWay_(way_element, way_tmp); 
                 ways_.push_back(way_tmp);
                 break;
             }
@@ -92,24 +114,29 @@ void OSMParser::createWays_(TiXmlHandle* h_root_way, TiXmlHandle* h_root_node)
     }
 }
 
-bool OSMParser::isHighway_(TiXmlElement* tag)
+bool OSMParser::filterWay_(tinyxml2::XMLElement* tag)
 {
     std::string key(tag->Attribute("k"));
+    std::string value(tag->Attribute("v"));
 
-    return (key == "highway");
+    if (map_properties_.key.count(key) || map_properties_.value.count(value))
+    {
+        return true;
+    }
+    return false;
 }
 
-void OSMParser::getNodesInWay_(TiXmlElement* way_element, osm_way_t& way)
+void OSMParser::getNodesInWay_(tinyxml2::XMLElement* way_element, osm_way_t& way)
 {
-    TiXmlElement* node_element;
+    tinyxml2::XMLElement* node_element;
 
-    node_element = way_element->FirstChild("nd")->ToElement();
-    TiXmlHandle h_root_node(node_element);
-    node_element = h_root_node.Element();
+    node_element = way_element->FirstChildElement("nd");
+    tinyxml2::XMLHandle h_root_node(node_element);
+    node_element = h_root_node.ToElement();
 
     way.nodes_id.clear();
     size_t node_id;
-    for (node_element; node_element; node_element = node_element->NextSiblingElement("nd"))
+    for (; node_element; node_element = node_element->NextSiblingElement("nd"))
     {
         std::sscanf(node_element->Attribute("ref"), "%zu", &node_id);
         way.nodes_id.push_back(node_id);
@@ -125,7 +152,8 @@ void OSMParser::createNodes_()
     size_t idx = 0;
     for (const auto& node_id_idx : nodes_id_idx_table_)
     {
-        nodes_map_[node_id_idx.first].id = idx; // Setting ID of location_t as index of vector 'nodes_'
+        // Setting ID of location_t as index of vector 'nodes_'
+        nodes_map_[node_id_idx.first].id = idx;
         nodes_[idx] = nodes_map_[node_id_idx.first];
         nodes_id_idx_table_[node_id_idx.first] = idx++;
     }
@@ -137,43 +165,20 @@ void OSMParser::createNetwork_()
     connection_.resize(nodes_.size());
 
     double distance = 0;
-    bipedlab::debugger::debugTitleTextOutput("[OSM Parser]",
-        "Create Network (Nodes : " + std::to_string(nodes_id_idx_table_.size()) +
-        ") (Ways : " + std::to_string(ways_.size()) + ")", 10);
 
     for (const auto& way : ways_)
     {
         for (std::size_t i = 0; i < way.nodes_id.size() - 1; ++i)
         {
-            distance = getDistanceFromNodes_(nodes_map_[way.nodes_id[i]],
-                                             nodes_map_[way.nodes_id[i+1]]);
+            distance = computeHaversineDistance(
+                nodes_map_[way.nodes_id[i]], nodes_map_[way.nodes_id[i+1]]);
 
-            int left_node_idx = nodes_id_idx_table_[way.nodes_id[i]];
-            int right_node_idx = nodes_id_idx_table_[way.nodes_id[i+1]];
+            size_t left_node_idx = nodes_id_idx_table_[way.nodes_id[i]];
+            size_t right_node_idx = nodes_id_idx_table_[way.nodes_id[i+1]];
 
-            connection_[left_node_idx].push_back({right_node_idx, distance});
-            connection_[right_node_idx].push_back({left_node_idx, distance});
+            connection_[left_node_idx].insert({right_node_idx, distance});
+            connection_[right_node_idx].insert({left_node_idx, distance});
+            edge_number_++;
         }
     }
-}
-
-double OSMParser::getDistanceFromNodes_(const location_t& node1,
-                                        const location_t& node2)
-{
-    static constexpr double DEG2RAD = M_PI / 180;
-    static const int EARTH_RADIUS = 6371e3; // in metres;
-
-    double lat1_rad = node1.latitude * DEG2RAD;
-    double lat2_rad = node2.latitude * DEG2RAD; 
-    double diff_lat_rad = (node2.latitude - node1.latitude) * DEG2RAD;
-    double diff_lon_rad = (node2.longitude - node1.longitude) * DEG2RAD;
-
-    // 'Harversine' Formula
-    // http://www.movable-type.co.uk/scripts/latlong.html
-    double a = std::pow(std::sin(diff_lat_rad / 2), 2) + std::cos(lat1_rad) * 
-               std::cos(lat2_rad) * std::pow(std::sin(diff_lon_rad / 2), 2);
-    double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
-    double d = EARTH_RADIUS * c; // in metres
-
-    return d;
 }
