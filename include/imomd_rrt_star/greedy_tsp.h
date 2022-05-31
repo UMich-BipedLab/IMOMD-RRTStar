@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        greedy_tsp.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     03/15/2022
  * 
  * Description: solve tsp by brute-force method

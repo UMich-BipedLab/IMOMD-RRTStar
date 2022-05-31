@@ -4,14 +4,14 @@
 This is a package for the system of multi-objective and multi-destination path
 planning, described in paper: **Informable Multi-Objective and Multi-Directional
 RRT\* System for Robot Path
-Planning**([PDF](052122_ISRR_imomd_rrt.pdf))([arXiv](???)). This work is submitted to
-International Symposium of Robotic Research (ISRR).
+Planning**([PDF](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/052122_ISRR_imomd_rrt.pdf))([arXiv](http://arxiv.org/abs/2205.14853)).
+This work is submitted to International Symposium of Robotic Research (ISRR).
 
 The experimental results confirm that by using the IMOMD-RRT\* algorithm and the solver of relaxed traveling salesman problem (R-TSP). We outperform baseline (Bi-A\* and ANA\*) in terms of speed and memory usage.
 
 **[Note]** This is a standalone c++ library to users to plugin to their system
 without any dependency. Additionally, we also provide a ROS wrapper for the library.
-Please checkout to `ros_wrapper` branch for more details.
+Please checkout to `ros_wrapper_isrr_release` branch for more details.
 
 * **Author** : Jiunn-Kai Huang, Yingwen Tan, Dongmyeong Lee, Vishunu R.Desaraju, and Jessy W. Grizzle
 * **Maintainer** : [Bruce JK Huang](https://www.brucerobot.com/) and Dongmyeong Lee
@@ -35,6 +35,7 @@ Table of Contents
          * [Qualitative and Quantitative Results](#qualitative-and-quantitative-results-1)
    * [Required System / Library / Packages](#required-system--library--packages)
    * [Regenerate Paper Results](#regenerate-paper-results)
+   * [How to use your Own Customized Map](#how-to-use-your-own-customized-map)
    * [Citation](#citation)
 
 
@@ -162,17 +163,19 @@ consumes 58.9 times less memory than Bi-A\*
 <img src="graphics/bugtrap_pseudo_plot.png">
 
 ## Required System / Library / Packages 
-This is a standalone library for the proposed system. There is no required package to
-run the package. To plot the qualitative results, the following requirements are
-required:
-    * Python3
-        * pandas
-        * matplotlib
+This is a standalone library for the proposed system. There is no required
+package to run the package. To plot the qualitative results, the following
+requirements are required:
+
+* Python3
+    * pandas
+    * matplotlib
 
 ## Regenerate Paper Results
-**[Note]** To generate the result on paper, please download the [OSM](https://drive.google.com/drive/folders/1sA5MH-K6EoiYh0PNqJMcITsmXCxjyfdJ?usp=sharing) files
-into [osm_data](https://github.com/brucejk/MO-RRTStar/tree/release/osm_data)
-folder.
+**[Note]** To generate the result on paper, please download the
+[OSM](https://drive.google.com/drive/folders/1sA5MH-K6EoiYh0PNqJMcITsmXCxjyfdJ?usp=sharing)
+files into
+[osm_data](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/osm_data) folder.
 
 **[How To Use Config File]** In `config/algorithm_config.yaml`, you can change
 parameters for the system.
@@ -211,27 +214,43 @@ parameters for the system.
 * Move CSV files that you want to compare from `experiments` folder to
   `experiments/large/seattle` or `experiments/bugtrap/sanfrancisco` folder.
 * Change
-  [folder](https://github.com/brucejk/MO-RRTStar/blob/a71908502b3635f44deb9eb005f0b805a69a932e/experiments/plot_result.py#L7)
+  [folder](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/experiments/plot_result.py#L7)
   value in `experiments/plot_results.py` into the folder name you placed CSV
   files.
 * Change
-  [files](https://github.com/brucejk/MO-RRTStar/blob/a71908502b3635f44deb9eb005f0b805a69a932e/experiments/plot_result.py#L9)
+  [files](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/experiments/plot_result.py#L9)
   value in `experiments/plot_results.py` into the file name you placed in the
   above folder. ex) `imomd.csv` -> `imomd`
 * run `experiments/plot_results.py`
     
 **[Visualization through Rviz]**
-* Please checkout to `ros_wrapper` branch and follow the instruction there.
+* Please checkout to `ros_wrapper_isrr_release` branch and follow the instruction there.
 
+## How to use your Own Customized Map
+If you want to execute IMOMD-RRT\* on your own customized map, it requires two
+data structure.
+
+* **nodes** : `std::shared_ptr<std::vector<location_t>> raw_map`
+    * A list of `location_t` that includes id, latitude, longitude
+* **edges** : `std::shared_ptr<std::vector<std::unordered_map<size_t, double>>> graph`
+    * An adjacency list with `{node_id, haversine distance}`
+
+Please take a look
+[fake_map.h](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/include/fake_map/fake_map.h)
+for example. 
 
 ## Citation
 The detail is described in: **Informable Multi-Objective and Multi-Directional
-RRT\* System for Robot Path Planning**, Jiunn-Kai (Bruce) Huang, Yingwen Tan, Dongmyeong Lee, Vishunu R. Desaraju, and Jessy W. Grizzle
-([PDF](052122_ISRR_imomd_rrt.pdf))([arXiv](???)).
+RRT\* System for Robot Path Planning**, Jiunn-Kai (Bruce) Huang, Yingwen Tan,
+Dongmyeong Lee, Vishunu R. Desaraju, and Jessy W. Grizzle
+([PDF](https://github.com/UMich-BipedLab/IMOMD-RRTStar/tree/lib_isrr_release/052122_ISRR_imomd_rrt.pdf))([arXiv](http://arxiv.org/abs/2205.14853)).
 ```
 @article{huang2022imomd,
-    title={Informable Multi-Objective and Multi-Directional RRT\* System for Robot Path Planning},
-    author={Jiunn-Kai (Bruce) Huang, Yingwen Tan, Dongmyeong Lee, Vishunu R. Desaraju, and Jessy W. Grizzle},
-    year={2022},
-    journal={} }
+      title={Informable Multi-Objective and Multi-Directional RRT* System for Robot Path Planning},
+      author={Jiunn-Kai Huang and Yingwen Tan and Dongmyeong Lee and Vishnu R. Desaraju and Jessy W. Grizzle},
+      year={2022},
+      eprint={2205.14853},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
 ```

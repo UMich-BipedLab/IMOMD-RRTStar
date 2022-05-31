@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        osm_parser.cpp
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     02/24/2022
  * 
  * Description: Parser Open Street Map(xml) to vector data in c++

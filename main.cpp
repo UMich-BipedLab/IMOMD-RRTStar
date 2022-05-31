@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        main.cpp
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     02/20/2022
  * 
  * Description: Main Script for executing robot path planning
