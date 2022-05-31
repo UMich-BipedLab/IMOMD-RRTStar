@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        imomd_setting_t.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     02/20/2022
  * 
  * Description: struct for storing setting for Path Planning

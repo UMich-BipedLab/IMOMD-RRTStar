@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        eci_gen_tsp_solver.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     03/10/2022
  * 
  * Description: Solving Relaxed Traveling Salesman Problem with 

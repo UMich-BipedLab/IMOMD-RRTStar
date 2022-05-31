@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        fake_map.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     03/08/2022
  * 
  * Description: Generate Fake Map for IMOMD

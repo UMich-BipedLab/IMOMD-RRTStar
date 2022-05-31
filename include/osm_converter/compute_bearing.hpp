@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        compute_bearing.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     05/18/2022
  * 
  * Description: Compute Bearing

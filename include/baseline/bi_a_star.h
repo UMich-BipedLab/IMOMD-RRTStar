@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        bi_a_star.h
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     04/23/2022
  * 
  * Description: Expand from destinations separately in Bidirectional A* way.

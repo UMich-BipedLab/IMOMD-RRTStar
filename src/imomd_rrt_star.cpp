@@ -27,7 +27,7 @@
 /*******************************************************************************
  * File:        imomd_rrt_star.cpp
  * 
- * Author:      Dongmyeong Lee (dongmyeong[at]umich.edu)
+ * Author:      Dongmyeong Lee (domlee[at]umich.edu)
  * Created:     02/20/2022
  * 
  * Description: Informable Multi-Objective and Multi-Directiobal RRT*
